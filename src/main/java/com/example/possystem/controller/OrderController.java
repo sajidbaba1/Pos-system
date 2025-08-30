@@ -2,12 +2,16 @@ package com.example.possystem.controller;
 
 import com.example.possystem.domain.*;
 import com.example.possystem.dto.OrderRequest;
+import com.example.possystem.integration.RazorpayService;
+import com.example.possystem.integration.StripeService;
 import com.example.possystem.service.*;
+import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,6 +32,12 @@ public class OrderController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private StripeService stripeService;
+
+    @Autowired
+    private RazorpayService razorpayService;
 
     @PostMapping
     public Order createOrder(@RequestBody OrderRequest orderRequest) {
@@ -58,6 +68,14 @@ public class OrderController {
         order.setOrderItems(orderItems);
 
         return orderService.createOrder(order);
+    }
+
+    @PostMapping("/create-stripe-payment-intent")
+    public ResponseEntity<Map<String, String>> createStripePaymentIntent(@RequestBody OrderRequest orderRequest) throws StripeException {
+        // In a real application, you would calculate the total amount from the orderRequest
+        // For now, let's use a dummy amount
+        com.stripe.model.PaymentIntent paymentIntent = stripeService.createPaymentIntent(new java.math.BigDecimal("100.00"));
+        return ResponseEntity.ok(Map.of("clientSecret", paymentIntent.getClientSecret()));
     }
 
     @GetMapping("/{id}")

@@ -4,14 +4,18 @@ import com.example.possystem.domain.Category;
 import com.example.possystem.domain.Product;
 import com.example.possystem.domain.Store;
 import com.example.possystem.dto.ProductRequest;
+import com.example.possystem.integration.CloudinaryService;
 import com.example.possystem.service.CategoryService;
 import com.example.possystem.service.ProductService;
 import com.example.possystem.service.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -25,6 +29,9 @@ public class ProductController {
 
     @Autowired
     private StoreService storeService;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @PostMapping
     public Product createProduct(@RequestBody ProductRequest productRequest) {
@@ -43,6 +50,12 @@ public class ProductController {
         product.setStore(store);
 
         return productService.createProduct(product);
+    }
+
+    @PostMapping("/upload-image")
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        String imageUrl = cloudinaryService.uploadFile(file);
+        return ResponseEntity.ok(Map.of("url", imageUrl));
     }
 
     @GetMapping("/{id}")
@@ -71,7 +84,7 @@ public class ProductController {
 
         Product productDetails = new Product();
         productDetails.setName(productRequest.getName());
-        productDetails.setSku(productRequest.getSku());
+        productDetails.setSku(productDetails.getSku());
         productDetails.setBrand(productRequest.getBrand());
         productDetails.setImage(productRequest.getImage());
         productDetails.setPrice(productRequest.getPrice());
