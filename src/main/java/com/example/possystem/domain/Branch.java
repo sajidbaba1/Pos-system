@@ -2,25 +2,24 @@ package com.example.possystem.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.math.BigDecimal;
+import java.time.LocalTime;
 
 @Entity
 @Data
-@Table(name = "products")
-public class Product {
+@Table(name = "branches")
+public class Branch {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-    private String sku;
-    private String brand;
-    private String image;
-    private BigDecimal price;
-
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    private String address;
+    private String phone;
+    private String email;
+    private String workingDays;
+    private LocalTime openTime;
+    private LocalTime closeTime;
 
     @ManyToOne
     @JoinColumn(name = "store_id")
